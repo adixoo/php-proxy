@@ -1,7 +1,7 @@
 
-// done ✔
-<?php
 
+<?php
+// done ✔
 // Define a function to handle the response
 function sendResponse($code, $message) {
     http_response_code($code);
