@@ -3,7 +3,7 @@
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
   http_response_code(405);
   header("Content-Type: application/json");
-  echo json_encode(["error" => "This endpoint only accepts POST requests"]);
+  echo json_encode(["error" => "Move to Home Page"]);
   exit();
 }
 
