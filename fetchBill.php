@@ -15,8 +15,25 @@ if (strpos($contentType, "application/json") !== 0) {
     exit();
 }
 
+$key = "n5zqpf9ul7LPWMjDO6ePozakUwjdjQLL"
+
+
 try {
     $data = json_decode(file_get_contents("php://input"), true);
+    if (!isset($data["key"])) {
+        throw new Exception("Missing required key 'key' in request data");
+    }
+
+    $keyToCheck = $data["key"]; 
+    
+  if ($keyToCheck !== $key) {
+    http_response_code(400);
+    header("Access-Control-Allow-Origin: *");
+    header("Content-Type: application/json");
+    $response = ["status" => "failed", "error" => "key"];
+    echo json_encode($response);
+    exit();
+  }
 
     $query_string = http_build_query($data);
     $url = "https://jsonplaceholder.typicode.com/users?" . $query_string;
