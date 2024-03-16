@@ -7,7 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
   exit();
 }
 
-// Hardcoded target URL
 $target_url = "https://post.request.com/r";
 
 $contentType = isset($_SERVER["CONTENT_TYPE"]) ? $_SERVER["CONTENT_TYPE"] : "";
@@ -21,14 +20,13 @@ if (strpos($contentType, "application/json") !== 0) {
 try {
   $data = json_decode(file_get_contents("php://input"), true);
 
-  // Assuming your data is sent as JSON in the request body
   $postData = json_encode($data);
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $target_url);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, 1);  // Set request method to POST
-  curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);  // Set data for POST request
+  curl_setopt($ch, CURLOPT_POST, 1);  
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $postData); 
 
   if (curl_errno($ch)) {
     $error_msg = curl_error($ch);
@@ -39,7 +37,6 @@ try {
   $response_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
   curl_close($ch);
 
-  // Assuming the response is also JSON
   $responseData = json_decode($response, true);
 
   http_response_code($response_code);
