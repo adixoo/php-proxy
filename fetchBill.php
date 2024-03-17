@@ -38,7 +38,7 @@ try {
 
     // Prepare the query string and URL
     $query_string = http_build_query($data);
-    $url = "https://api.roundpay.net//API/TransactionAPI?" . $query_string;
+    $url = "https://api.roundpay.net//API/FetchBill?" . $query_string;
 
     // Initialize cURL and set options
     $ch = curl_init();
@@ -51,7 +51,7 @@ try {
     curl_close($ch);
 
     // Decode the response and send it back
-    $response = json_decode($response, true)[0];
+    $response = json_decode($response, true);
     sendResponse($response_code, $response);
 } catch (Exception $e) {
     sendResponse(500, ["status" => "failed", "error" => $e->getMessage()]);
