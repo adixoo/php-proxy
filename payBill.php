@@ -1,57 +1,59 @@
-<?php
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-  http_response_code(405);
-  header("Content-Type: application/json");
-  echo json_encode(["error" => "Move to Home Page"]);
-  exit();
+
+<?php
+// done ✔
+// Define a function to handle the response
+function sendResponse($code, $message) {
+    http_response_code($code);
+    header("Content-Type: application/json");
+    echo json_encode($message);
+    exit();
 }
 
+// Check if the request method is POST
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    sendResponse(405, ["message" => "Move To Home Page"]);
+}
 
-$target_url = "https://post.request.com/r";
-
+// Check if the content type is application/json
 $contentType = isset($_SERVER["CONTENT_TYPE"]) ? $_SERVER["CONTENT_TYPE"] : "";
 if (strpos($contentType, "application/json") !== 0) {
-  http_response_code(415);
-  header("Content-Type: application/json");
-  echo json_encode(["error" => "Content-Type must be application/json"]);
-  exit();
+    sendResponse(415, ["message" => "Move To Home Page"]);
 }
+
+// Define the key for validation
+$key = "n5zqpf9ul7LPWMjDO6ePozakUwjdjQLL";
 
 try {
-  $data = json_decode(file_get_contents("php://input"), true);
+    // Decode the input data
+    $data = json_decode(file_get_contents("php://input"), true);
 
-  $postData = json_encode($data);
+    // Validate the key
+    if (!isset($data["key"]) || $data["key"] !== $key) {
+        sendResponse(400, ["status" => "failed", "message" => "key"]);
+    }
 
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, $target_url);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, 1); 
-  curl_setopt($ch, CURLOPT_POSTFIELDS, $postData); 
+    // Remove the key from the data array after validation
+    unset($data["key"]);
 
-  if (curl_errno($ch)) {
-    $error_msg = curl_error($ch);
-    throw new Exception("cURL error: $error_msg");
-  }
+    // Prepare the query string and URL
+    $query_string = http_build_query($data);
+    $url = "https://api.roundpay.net//API/TransactionAPI?" . $query_string;
 
-  $response = curl_exec($ch);
-  $response_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-  curl_close($ch);
+    // Initialize cURL and set options
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-  $responseData = json_decode($response, true);
+    // Execute the cURL request
+    $response = curl_exec($ch);
+    $response_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
 
-  http_response_code($response_code);
-  header("Access-Control-Allow-Origin: *");
-  header("Content-Type: application/json");
-  echo json_encode($responseData);
-  exit();
+    // Decode the response and send it back
+    $response = json_decode($response, true);
+    sendResponse($response_code, $response);
 } catch (Exception $e) {
-  http_response_code(500);
-  header("Access-Control-Allow-Origin: *");
-  header("Content-Type: application/json");
-  $response = ["status" => "failed", "error" => $e->getMessage()];
-  echo json_encode($response);
-  exit();
+    sendResponse(500, ["status" => "failed", "error" => $e->getMessage()]);
 }
-
 ?>
