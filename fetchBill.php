@@ -38,7 +38,7 @@ try {
 
     // Prepare the query string and URL
     $query_string = http_build_query($data);
-    $url = "https://jsonplaceholder.typicode.com/users?" . $query_string;
+    $url = "https://api.roundpay.net//API/TransactionAPI?" . $query_string;
 
     // Initialize cURL and set options
     $ch = curl_init();
